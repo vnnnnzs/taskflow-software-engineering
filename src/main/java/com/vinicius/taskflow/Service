@@ -1,0 +1,42 @@
+package com.vinicius.taskflow.service;
+
+import com.vinicius.taskflow.model.Task;
+import com.vinicius.taskflow.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class TaskService {
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    public List<Task> listarTodas() {
+        return taskRepository.findAll();
+    }
+
+    public Optional<Task> buscarPorId(Long id) {
+        return taskRepository.findById(id);
+    }
+
+    public Task salvar(Task task) {
+        return taskRepository.save(task);
+    }
+
+    public Task atualizar(Long id, Task taskAtualizada) {
+        return taskRepository.findById(id).map(task -> {
+            task.setTitulo(taskAtualizada.getTitulo());
+            task.setDescricao(taskAtualizada.getDescricao());
+            task.setStatus(taskAtualizada.getStatus());
+            task.setPrioridade(taskAtualizada.getPrioridade());
+            return taskRepository.save(task);
+        }).orElseThrow(() -> new RuntimeException("Tarefa não encontrada com o ID: " + id));
+    }
+
+    public void deletar(Long id) {
+        taskRepository.deleteById(id);
+    }
+}
